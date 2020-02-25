@@ -5,7 +5,6 @@ Vagrant.configure("2") do |config|
     v.cpus = 2
   end
 
-  # precedente plage : 192.168.50.2
   $script = <<-SCRIPT
   echo "172.18.18.2 k8s1" >> /etc/hosts
   echo "172.18.18.3 k8s2" >> /etc/hosts
@@ -55,24 +54,22 @@ EOF
   SCRIPT
 
 
-  # config.vm.network "private_network", type: "dhcp"
 
   config.vm.provision "shell", inline: $script
 
   config.vm.define "k8s1" do |k8s1|
-    # web.vm.box = "apache"
     k8s1.vm.hostname = "k8s1"
     k8s1.vm.network "private_network",  ip: "172.18.18.2"
+    k8s1.vm.provision "file", source: "calico.yaml", destination: "calico.yaml"
+    k8s1.vm.provision "file", source: "kube-flannel.yaml", destination: "kube-flannel.yaml"
   end
 
   config.vm.define "k8s2" do |k8s2|
-    # db.vm.box = "mysql"
     k8s2.vm.hostname = "k8s2"
     k8s2.vm.network "private_network",  ip: "172.18.18.3"
   end
 
   config.vm.define "k8s3" do |k8s3|
-    # db.vm.box = "mysql"
     k8s3.vm.hostname = "k8s3"
     k8s3.vm.network "private_network",  ip: "172.18.18.4"
   end
